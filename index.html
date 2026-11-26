@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Kearsipan - BBWS Cimanuk Cisanggarung | Kementerian PU</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="bg-[#e8eff9] text-slate-800 font-sans antialiased flex h-screen overflow-hidden p-3 gap-3">
+
+  <!-- LOGIN OVERLAY (HALAMAN LOGIN AWAL) -->
+  <div id="loginOverlay"
+    class="fixed inset-0 z-50 bg-gradient-to-br from-[#0f2454] via-[#183883] to-[#0a193d] flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-5 border border-white/20">
+      <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
+        <div class="w-11 h-11 rounded-xl bg-blue-50 border border-blue-200 p-1.5 flex items-center justify-center">
+          <img src="logo-pu.webp" alt="Logo PU" class="w-full h-full object-contain"
+            onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Logo_PU_%28Kementerian_Pekerjaan_Umum%29.png/120px-Logo_PU_%28Kementerian_Pekerjaan_Umum%29.png'">
+        </div>
+        <div>
+          <h2 class="text-sm font-extrabold text-slate-800 uppercase tracking-wide">Sistem Kearsipan Kementerian PU</h2>
+          <p class="text-[11px] text-slate-500">BBWS Cimanuk Cisanggarung &bull; Login Admin</p>
+        </div>
+      </div>
+
+      <form onsubmit="handleLogin(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Pilih Akun / Role Admin *</label>
+          <select id="loginRoleSelect"
+            class="w-full p-2.5 rounded-xl border border-slate-300 bg-slate-50 font-semibold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <option value="PUSAT">Admin Pusat (Kelola &amp; Edit Semua)</option>
+            <option value="Pusat">Admin Gedung 1 — Gedung Pusat (Input Saja)</option>
+            <option value="Gedung 2">Admin Gedung 2 — Barat (Input Saja)</option>
+            <option value="Gedung 3">Admin Gedung 3 — Timur (Input Saja)</option>
+            <option value="Gedung 4">Admin Gedung 4 — Selatan (Input Saja)</option>
+            <option value="Gedung 5">Admin Gedung 5 — Utara (Input Saja)</option>
+            <option value="Gedung 6">Admin Gedung 6 — Cirebon (Input Saja)</option>
+            <option value="Gedung 7">Admin Gedung 7 — Indramayu (Input Saja)</option>
+            <option value="Gedung 8">Admin Gedung 8 — Kuningan (Input Saja)</option>
+            <option value="Gedung 9">Admin Gedung 9 — Majalengka (Input Saja)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Password *</label>
+          <input type="password" id="loginPassword" value="pu2026" required placeholder="Masukkan password..."
+            class="w-full p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          <p class="text-[10px] text-slate-400 mt-1">Default password: <code
+              class="bg-slate-100 px-1 rounded text-slate-700">pu2026</code></p>
+        </div>
+
+        <button type="submit"
+          class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-md transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-right-to-bracket"></i> Masuk ke Sistem
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- GLASSY SIDEBAR V10 (TEMA PU BIRU) -->
+  <aside id="appSidebar"
+    class="glassy-sidebar w-[276px] text-white flex p-2.5 pr-2.5 gap-0 flex-shrink-0 z-20 select-none">
+
+    <!-- LEFT MAIN GLASS COLUMN -->
+    <div class="sidebar-main-col flex-1 min-w-0 flex flex-col justify-between overflow-hidden">
+
+      <!-- Top Brand & Search -->
+      <div class="space-y-3 pr-2.5">
+        <!-- Logo & Header Instansi -->
+        <div class="px-1.5 pt-1 flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div
+              class="w-9 h-9 rounded-full bg-white/15 border border-white/30 p-1 flex items-center justify-center flex-shrink-0 shadow-inner">
+              <img src="logo-pu.webp" alt="Logo PU" class="w-full h-full object-contain"
+                onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Logo_PU_%28Kementerian_Pekerjaan_Umum%29.png/120px-Logo_PU_%28Kementerian_Pekerjaan_Umum%29.png'">
+            </div>
+            <div class="min-w-0">
+              <h1 class="text-xs font-bold tracking-wide text-yellow-300 leading-tight truncate">Kementerian PU</h1>
+              <p class="text-[10px] text-blue-100/80 font-medium truncate">BBWS Cimanuk Cisanggarung</p>
+            </div>
+          </div>
+          <button onclick="toggleSidebar()" title="Kecilkan / Perbesar Sidebar"
+            class="w-6 h-6 rounded-full bg-white/15 hover:bg-white/25 border border-white/20 flex items-center justify-center text-[10px] text-white transition flex-shrink-0">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+        </div>
+
+        <!-- Glassy Search Bar -->
+        <div class="sidebar-search rounded-full px-3 py-1.5 flex items-center gap-2 transition">
+          <i class="fa-solid fa-magnifying-glass text-blue-100/70 text-xs"></i>
+          <input id="sidebarSearchInput" type="text" oninput="filterSidebarMenu(this.value)" placeholder="Cari menu..."
+            class="bg-transparent text-xs text-white placeholder-blue-100/60 focus:outline-none w-full min-w-0">
+          <span
+            class="text-[9px] font-mono bg-white/15 text-blue-100 px-1.5 py-0.5 rounded-md border border-white/15 flex-shrink-0">⌘K</span>
+        </div>
+      </div>
+
+      <!-- Scrollable Navigation & Quick Links -->
+      <div class="flex-1 overflow-y-auto sidebar-scroll py-3 space-y-4">
+
+        <!-- Main Navigation Pills -->
+        <nav class="space-y-2 text-[13px] font-medium" id="sidebarNavList">
+          <button onclick="switchTab('beranda')" id="nav-beranda" data-label="beranda home dashboard"
+            class="nav-item active w-full flex items-center justify-between px-3.5 py-2.5">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i class="fa-solid fa-house w-4 text-center text-xs"></i>
+              <span class="truncate">Beranda</span>
+            </div>
+          </button>
+
+          <button onclick="switchTab('kpi')" id="nav-kpi" data-label="kpi kearsipan 10 indikator"
+            class="nav-item w-full flex items-center justify-between px-3.5 py-2.5">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i class="fa-solid fa-chart-column w-4 text-center text-xs text-emerald-300"></i>
+              <span class="truncate">KPI Kearsipan</span>
+            </div>
+            <span
+              class="nav-badge text-[10px] bg-white/15 px-1.5 py-0.5 rounded-full text-emerald-200 font-mono border border-white/15">10</span>
+          </button>
+
+          <button onclick="switchTab('stok')" id="nav-stok" data-label="stok pengelolaan arsip gudang"
+            class="nav-item w-full flex items-center justify-between px-3.5 py-2.5">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i class="fa-solid fa-boxes-stacked w-4 text-center text-xs text-amber-300"></i>
+              <span class="truncate">Stok Arsip</span>
+            </div>
+          </button>
+
+          <button onclick="switchTab('musnah')" id="nav-musnah" data-label="rencana pemusnahan arsip"
+            class="nav-item w-full flex items-center justify-between px-3.5 py-2.5">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i class="fa-solid fa-calendar-xmark w-4 text-center text-xs text-purple-300"></i>
+              <span class="truncate">Pemusnahan</span>
+            </div>
+          </button>
+
+          <button onclick="switchTab('input-data')" id="nav-input-data" data-label="input update data petugas"
+            class="nav-item w-full flex items-center justify-between px-3.5 py-2.5">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i class="fa-solid fa-pen-to-square w-4 text-center text-xs text-cyan-300"></i>
+              <span class="truncate">Input Data</span>
+            </div>
+            <span
+              class="nav-badge text-[10px] bg-yellow-400/20 text-yellow-200 px-1.5 py-0.5 rounded-full border border-yellow-300/30 font-semibold">Petugas</span>
+          </button>
+
+          <button onclick="switchTab('laporan')" id="nav-laporan" data-label="laporan tindak lanjut eksekutif"
+            class="nav-item w-full flex items-center justify-between px-3.5 py-2.5">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i class="fa-solid fa-file-export w-4 text-center text-xs text-teal-300"></i>
+              <span class="truncate">Laporan</span>
+            </div>
+          </button>
+
+          <button onclick="switchTab('sdm-target')" id="nav-sdm-target" data-label="sdm gedung target kerja konversi"
+            class="nav-item w-full flex items-center justify-between px-3.5 py-2.5">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i class="fa-solid fa-users-gear w-4 text-center text-xs text-indigo-300"></i>
+              <span class="truncate">SDM & Target</span>
+            </div>
+            <span
+              class="nav-badge text-[10px] bg-indigo-400/20 text-indigo-200 px-1.5 py-0.5 rounded-full border border-indigo-300/30 font-semibold">Baru</span>
+          </button>
+
+          <button onclick="switchTab('anri-rekap')" id="nav-anri-rekap" data-label="rekap semester 6 bulan anri 5 tahun"
+            class="nav-item w-full flex items-center justify-between px-3.5 py-2.5">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <i class="fa-solid fa-building-columns w-4 text-center text-xs text-rose-300"></i>
+              <span class="truncate">Rekap ANRI</span>
+            </div>
+            <span
+              class="nav-badge text-[10px] bg-rose-400/20 text-rose-200 px-1.5 py-0.5 rounded-full border border-rose-300/30 font-semibold">5
+              Thn</span>
+          </button>
+        </nav>
+
+        <!-- Divider & Sistem / Database Section -->
+        <div class="pt-2 border-t border-white/15 space-y-2">
+          <div class="px-2 pr-3 flex items-center justify-between">
+            <span class="text-[10px] font-bold tracking-widest uppercase text-blue-200/70">Sistem & Data</span>
+            <button onclick="switchTab('input-data')" title="Tambah Data Cepat"
+              class="w-5 h-5 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center text-[10px] text-white transition">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
+
+          <div class="space-y-1.5">
+            <button onclick="switchTab('database')" id="nav-database" data-label="database pusat sheets"
+              class="nav-item w-full flex items-center justify-between px-3.5 py-2 text-xs">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span
+                  class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] flex-shrink-0"></span>
+                <span class="truncate">Database Pusat</span>
+              </div>
+              <span class="nav-badge text-[10px] bg-white/15 px-1.5 py-0.5 rounded-full font-mono">Sheets</span>
+            </button>
+
+            <button onclick="openModal('modalSettings')"
+              class="nav-item w-full flex items-center justify-between px-3.5 py-2 text-xs">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span
+                  class="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)] flex-shrink-0"></span>
+                <span class="truncate">Pengaturan Sistem</span>
+              </div>
+              <i class="fa-solid fa-gear text-[10px] text-blue-200/70"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Glassy Status Card & User Profile -->
+      <div class="space-y-2.5 pt-2 pr-2.5">
+        <!-- PU Kearsipan Status Card -->
+        <div class="sidebar-glass-card rounded-2xl p-2.5 flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2 min-w-0">
+            <div
+              class="w-7 h-7 rounded-full bg-yellow-400/20 border border-yellow-300/40 flex items-center justify-center text-yellow-300 flex-shrink-0">
+              <i class="fa-solid fa-award text-xs"></i>
+            </div>
+            <div class="min-w-0">
+              <p class="text-[11px] font-bold text-white leading-tight truncate">KPI Kearsipan</p>
+              <p class="text-[10px] text-blue-100/75 truncate">Target &ge; 95% Aktif</p>
+            </div>
+          </div>
+          <button onclick="switchTab('input-data')"
+            class="px-2.5 py-1 rounded-full bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-bold text-[10px] shadow-sm transition flex-shrink-0">
+            Update
+          </button>
+        </div>
+
+        <!-- User Profile Footer -->
+        <div class="pt-2 border-t border-white/15 flex items-center justify-between gap-2 px-1">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="relative flex-shrink-0">
+              <div
+                class="w-8 h-8 rounded-full bg-yellow-400 text-slate-900 font-extrabold text-xs flex items-center justify-center shadow">
+                AD
+              </div>
+              <span
+                class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#122e73]"></span>
+            </div>
+            <div class="min-w-0">
+              <p class="text-xs font-bold text-white truncate" id="userRoleName">Admin Kearsipan</p>
+              <p class="text-[10px] text-blue-200/80 truncate">arsip@pu.go.id</p>
+            </div>
+          </div>
+          <button onclick="openModal('modalSettings')" title="Opsi" class="text-blue-200/70 hover:text-white px-1">
+            <i class="fa-solid fa-ellipsis text-xs"></i>
+          </button>
+          <button onclick="logoutAdmin()" title="Keluar / Ganti Akun"
+            class="text-rose-300 hover:text-rose-200 px-1.5 py-1 rounded bg-white/10 text-[10px] font-bold">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT WHITE VERTICAL RAIL -->
+    <div class="sidebar-rail flex flex-col justify-between items-center py-2.5">
+      <div class="flex flex-col items-center gap-2.5">
+        <!-- Top Primary PU Icon Button -->
+        <button onclick="toggleSidebar()" title="Toggle Sidebar"
+          class="w-8 h-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center shadow-md shadow-blue-600/30 transition">
+          <i class="fa-solid fa-folder-open text-xs"></i>
+        </button>
+
+        <!-- Quick Add Data -->
+        <button onclick="switchTab('input-data')" title="Input Data Baru"
+          class="w-8 h-8 rounded-full bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-600 flex items-center justify-center transition">
+          <i class="fa-solid fa-plus text-xs"></i>
+        </button>
+
+        <!-- Replay Chart Animation -->
+        <button onclick="replayChartAnimations()" title="Putar Ulang Animasi Diagram"
+          class="w-8 h-8 rounded-full bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-600 flex items-center justify-center transition">
+          <i class="fa-solid fa-arrows-rotate text-xs"></i>
+        </button>
+      </div>
+
+      <!-- Vertical Active Tab Label -->
+      <div class="pb-2 flex flex-col items-center gap-2">
+        <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+        <span id="railActiveLabel"
+          class="rail-vertical-text text-[10px] font-bold text-slate-400 uppercase select-none">BERANDA</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN VIEWPORT -->
+  <div class="flex-1 flex flex-col overflow-hidden gap-3">
+
+    <!-- TOP NAVBAR -->
+    <header
+      class="min-h-[64px] h-auto bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-2xl px-5 py-2.5 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 shadow-sm z-10 flex-shrink-0">
+      <div class="flex items-center gap-3 min-w-0 flex-1">
+        <div class="min-w-0">
+          <div class="flex items-center gap-2">
+            <h2 id="topBarTitle" class="text-sm lg:text-base font-bold text-slate-800 truncate">Logger Studio - Capaian
+              KPI Kearsipan</h2>
+            <span
+              class="hidden 2xl:inline-flex whitespace-nowrap text-[11px] px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 font-semibold border border-blue-200">BBWS
+              Cimanuk Cisanggarung</span>
+          </div>
+          <p class="text-[11px] text-slate-500 truncate">Periode Aktif: <span class="font-semibold text-slate-700"
+              id="currentPeriodLabel">Tahun 2026</span> (1 Jan – 31 Des 2026)</p>
+        </div>
+      </div>
+
+      <!-- Filter Controls & Profile -->
+      <div class="flex items-center flex-wrap gap-2 flex-shrink-0">
+        <!-- Filter Periode -->
+        <div
+          class="flex items-center bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs text-slate-700 whitespace-nowrap">
+          <i class="fa-regular fa-calendar text-blue-600 mr-1.5"></i>
+          <span class="text-slate-400 mr-1 hidden xl:inline">Periode:</span>
+          <select id="filterPeriode" onchange="applyFilters()"
+            class="bg-transparent font-semibold text-slate-800 focus:outline-none cursor-pointer">
+            <option value="2026">Tahun 2026</option>
+            <option value="2025">Tahun 2025</option>
+          </select>
+        </div>
+
+        <!-- Filter Gedung Arsip -->
+        <div
+          class="flex items-center bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs text-slate-700 whitespace-nowrap">
+          <i class="fa-solid fa-building text-blue-600 mr-1.5"></i>
+          <span class="text-slate-400 mr-1 hidden xl:inline">Gedung:</span>
+          <select id="filterGedung" onchange="applyFilters()"
+            class="bg-transparent font-semibold text-slate-800 focus:outline-none cursor-pointer">
+            <option value="SEMUA">Semua (9 Gedung)</option>
+            <option value="Pusat">1. Gedung Arsip Pusat</option>
+            <option value="Gedung 2">2. Gedung Arsip 2 (Barat)</option>
+            <option value="Gedung 3">3. Gedung Arsip 3 (Timur)</option>
+            <option value="Gedung 4">4. Gedung Arsip 4 (Selatan)</option>
+            <option value="Gedung 5">5. Gedung Arsip 5 (Utara)</option>
+            <option value="Gedung 6">6. Gedung Arsip 6 (Cirebon)</option>
+            <option value="Gedung 7">7. Gedung Arsip 7 (Indramayu)</option>
+            <option value="Gedung 8">8. Gedung Arsip 8 (Kuningan)</option>
+            <option value="Gedung 9">9. Gedung Arsip 9 (Majalengka)</option>
+          </select>
+        </div>
+
+        <!-- Switch Role / Hak Akses Admin -->
+        <div
+          class="flex items-center bg-amber-50 border border-amber-300 rounded-xl px-2.5 py-1.5 text-xs text-amber-900 whitespace-nowrap">
+          <i class="fa-solid fa-user-shield text-amber-600 mr-1.5"></i>
+          <select id="roleSwitcher" onchange="switchAdminRole(this.value)"
+            class="bg-transparent font-bold text-amber-900 focus:outline-none cursor-pointer">
+            <option value="PUSAT">Admin Pusat (Kelola Semua)</option>
+            <option value="Pusat">Admin Gedung 1 (Pusat - Input Saja)</option>
+            <option value="Gedung 2">Admin Gedung 2 (Input Saja)</option>
+            <option value="Gedung 3">Admin Gedung 3 (Input Saja)</option>
+            <option value="Gedung 4">Admin Gedung 4 (Input Saja)</option>
+            <option value="Gedung 5">Admin Gedung 5 (Input Saja)</option>
+            <option value="Gedung 6">Admin Gedung 6 (Input Saja)</option>
+            <option value="Gedung 7">Admin Gedung 7 (Input Saja)</option>
+            <option value="Gedung 8">Admin Gedung 8 (Input Saja)</option>
+            <option value="Gedung 9">Admin Gedung 9 (Input Saja)</option>
+          </select>
+        </div>
+
+        <!-- Tombol Tambah Data Cepat -->
+        <button onclick="switchTab('input-data')"
+          class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-sm whitespace-nowrap">
+          <i class="fa-solid fa-plus text-[10px]"></i>
+          <span>Input Data</span>
+        </button>
+
+        <!-- Tombol Putar Ulang Animasi -->
+        <button onclick="replayChartAnimations()" title="Putar ulang animasi diagram"
+          class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-medium flex items-center gap-1.5 transition border border-slate-200 whitespace-nowrap">
+          <i class="fa-solid fa-play text-blue-600 text-[10px]"></i>
+          <span class="hidden lg:inline">Animasi</span>
+        </button>
+
+        <!-- Profile badge -->
+        <div class="flex items-center gap-2 pl-2 border-l border-slate-200 whitespace-nowrap">
+          <div
+            class="w-8 h-8 rounded-full bg-slate-800 text-yellow-400 font-bold text-xs flex items-center justify-center flex-shrink-0">
+            <i class="fa-solid fa-user-shield text-xs"></i>
+          </div>
+          <div class="text-left hidden sm:block">
+            <div class="text-xs font-bold text-slate-800 leading-tight">admin</div>
+            <div class="text-[10px] text-slate-500">Petugas Kearsipan</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT BODY (SCROLLABLE) -->
+    <main class="flex-1 overflow-y-auto p-3 pr-2 space-y-6 bg-transparent" id="mainContainer">
+
+      <!-- ================= TAB 1: BERANDA ================= -->
+      <section id="tab-beranda" class="tab-content block space-y-6">
+
+        <!-- ROW 1: 4 KARTU KPI UTAMA -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Card 1: KPI Arsip Aktif -->
+          <div
+            class="bg-white rounded-xl border border-slate-200/80 p-4 shadow-sm hover:shadow transition relative overflow-hidden">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-blue-500"></div>
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-xs font-semibold text-slate-500">KPI Arsip Aktif</span>
+              <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                <i class="fa-regular fa-folder-open text-sm"></i>
+              </div>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span class="text-3xl font-extrabold text-slate-800" id="kpiAktifVal">92%</span>
+              <span class="text-xs font-semibold text-emerald-600 flex items-center gap-0.5">
+                <i class="fa-solid fa-arrow-up text-[10px]"></i> 2% <span class="text-slate-400 font-normal">vs bln
+                  lalu</span>
+              </span>
+            </div>
+            <div class="mt-2 text-xs text-slate-500 flex justify-between items-center pt-2 border-t border-slate-100">
+              <span>Target: <strong class="text-slate-700">&ge; 95%</strong></span>
+              <span class="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded text-[10px] font-semibold">Tercapai
+                Baik</span>
+            </div>
+          </div>
+
+          <!-- Card 2: KPI Arsip Inaktif -->
+          <div
+            class="bg-white rounded-xl border border-slate-200/80 p-4 shadow-sm hover:shadow transition relative overflow-hidden">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-emerald-500"></div>
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-xs font-semibold text-slate-500">KPI Arsip Inaktif</span>
+              <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <i class="fa-regular fa-file-lines text-sm"></i>
+              </div>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span class="text-3xl font-extrabold text-slate-800" id="kpiInaktifVal">88%</span>
+              <span class="text-xs font-semibold text-emerald-600 flex items-center gap-0.5">
+                <i class="fa-solid fa-arrow-up text-[10px]"></i> 3% <span class="text-slate-400 font-normal">vs bln
+                  lalu</span>
+              </span>
+            </div>
+            <div class="mt-2 text-xs text-slate-500 flex justify-between items-center pt-2 border-t border-slate-100">
+              <span>Target: <strong class="text-slate-700">&ge; 90%</strong></span>
+              <span class="text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded text-[10px] font-semibold">Mendekati
+                Target</span>
+            </div>
+          </div>
+
+          <!-- Card 3: KPI Layanan Peminjaman -->
+          <div
+            class="bg-white rounded-xl border border-slate-200/80 p-4 shadow-sm hover:shadow transition relative overflow-hidden">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-amber-500"></div>
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-xs font-semibold text-slate-500">KPI Layanan Peminjaman</span>
+              <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                <i class="fa-regular fa-clock text-sm"></i>
+              </div>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span class="text-3xl font-extrabold text-slate-800" id="kpiPinjamVal">96%</span>
+              <span class="text-xs font-semibold text-emerald-600 flex items-center gap-0.5">
+                <i class="fa-solid fa-arrow-up text-[10px]"></i> 1% <span class="text-slate-400 font-normal">vs bln
+                  lalu</span>
+              </span>
+            </div>
+            <div class="mt-2 text-xs text-slate-500 flex justify-between items-center pt-2 border-t border-slate-100">
+              <span>Target: <strong class="text-slate-700">&ge; 95%</strong></span>
+              <span class="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded text-[10px] font-semibold">Melampaui
+                Target</span>
+            </div>
+          </div>
+
+          <!-- Card 4: KPI Pengelolaan Arsip -->
+          <div
+            class="bg-white rounded-xl border border-slate-200/80 p-4 shadow-sm hover:shadow transition relative overflow-hidden">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-purple-500"></div>
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-xs font-semibold text-slate-500">KPI Pengelolaan Arsip</span>
+              <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+                <i class="fa-solid fa-list-check text-sm"></i>
+              </div>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span class="text-3xl font-extrabold text-slate-800" id="kpiKelolaVal">90%</span>
+              <span class="text-xs font-semibold text-emerald-600 flex items-center gap-0.5">
+                <i class="fa-solid fa-arrow-up text-[10px]"></i> 2% <span class="text-slate-400 font-normal">vs bln
+                  lalu</span>
+              </span>
+            </div>
+            <div class="mt-2 text-xs text-slate-500 flex justify-between items-center pt-2 border-t border-slate-100">
+              <span>Target: <strong class="text-slate-700">&ge; 90%</strong></span>
+              <span class="text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded text-[10px] font-semibold">Sesuai
+                Target</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 2: TREN GRAFIK KPI + REKAP GEDUNG + RINGKASAN STOK & PEMUSNAHAN -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+          <!-- Kolom Kiri: Tren Capaian KPI (8 Kolom) -->
+          <div class="lg:col-span-8 space-y-6">
+
+            <!-- Box Grafik Tren KPI Bulanan -->
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+              <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                <div>
+                  <h3 class="text-sm font-bold text-slate-800">Tren Capaian KPI Kearsipan (Periode 1 Tahun)</h3>
+                  <p class="text-xs text-slate-500">Fluktuasi capaian 4 indikator utama dari Januari - Desember 2026</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span
+                    class="inline-flex items-center gap-1 text-[11px] text-blue-700 font-medium bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                    <span class="w-2 h-2 rounded-full bg-blue-600 inline-block"></span> Arsip Aktif
+                  </span>
+                  <span
+                    class="inline-flex items-center gap-1 text-[11px] text-emerald-700 font-medium bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                    <span class="w-2 h-2 rounded-full bg-emerald-600 inline-block"></span> Inaktif
+                  </span>
+                  <span
+                    class="inline-flex items-center gap-1 text-[11px] text-amber-700 font-medium bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                    <span class="w-2 h-2 rounded-full bg-amber-500 inline-block"></span> Peminjaman
+                  </span>
+                </div>
+              </div>
+              <div class="h-64 relative">
+                <canvas id="trendKPIChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Tabel Rekap Capaian KPI per Gedung Arsip -->
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+              <div class="flex justify-between items-center mb-3">
+                <h3 class="text-sm font-bold text-slate-800">Rekap Capaian KPI per Gedung Arsip</h3>
+                <span class="text-xs text-slate-500">Rata-rata kumulatif tahun berjalan</span>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-xs text-left">
+                  <thead class="bg-slate-50 text-slate-600 uppercase border-y border-slate-200">
+                    <tr>
+                      <th class="py-2.5 px-3">Gedung Arsip</th>
+                      <th class="py-2.5 px-3 text-center">Aktif (%)</th>
+                      <th class="py-2.5 px-3 text-center">Inaktif (%)</th>
+                      <th class="py-2.5 px-3 text-center">Peminjaman (%)</th>
+                      <th class="py-2.5 px-3 text-center">Pengelolaan (%)</th>
+                      <th class="py-2.5 px-3 text-center">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100 font-medium" id="rekapGedungTableBody">
+                    <!-- Dynamic Rows populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Kolom Kanan: Stok Arsip & Rencana Musnah (4 Kolom) -->
+          <div class="lg:col-span-4 space-y-6">
+
+            <!-- Box Ringkasan Stok Pengelolaan Arsip di Gedung -->
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
+                <div class="flex items-center gap-2">
+                  <i class="fa-solid fa-warehouse text-blue-600"></i>
+                  <h3 class="text-sm font-bold text-slate-800">Stok Pengelolaan Arsip</h3>
+                </div>
+                <button onclick="switchTab('stok')" class="text-xs text-blue-600 hover:underline">Detail &rarr;</button>
+              </div>
+
+              <div class="flex items-center gap-4 mb-4">
+                <div
+                  class="w-14 h-14 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700 text-2xl">
+                  <i class="fa-solid fa-boxes-packing"></i>
+                </div>
+                <div>
+                  <div class="text-2xl font-extrabold text-slate-800" id="totalStokLabel">12.450</div>
+                  <div class="text-xs text-slate-500">Total Box / Folder Tersimpan</div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-3 gap-2 text-center pt-2 border-t border-slate-100">
+                <div class="p-2 bg-blue-50/60 rounded-lg border border-blue-100">
+                  <span class="text-[10px] text-blue-600 font-medium block">Arsip Aktif</span>
+                  <span class="text-sm font-bold text-slate-800" id="stokAktifVal">6.230</span>
+                  <span class="text-[9px] text-slate-400 block font-medium">50%</span>
+                </div>
+                <div class="p-2 bg-emerald-50/60 rounded-lg border border-emerald-100">
+                  <span class="text-[10px] text-emerald-600 font-medium block">Arsip Inaktif</span>
+                  <span class="text-sm font-bold text-slate-800" id="stokInaktifVal">5.120</span>
+                  <span class="text-[9px] text-slate-400 block font-medium">41%</span>
+                </div>
+                <div class="p-2 bg-amber-50/60 rounded-lg border border-amber-100">
+                  <span class="text-[10px] text-amber-600 font-medium block">Arsip Vital</span>
+                  <span class="text-sm font-bold text-slate-800" id="stokVitalVal">1.100</span>
+                  <span class="text-[9px] text-slate-400 block font-medium">9%</span>
+                </div>
+              </div>
+
+              <!-- Mini Donut Chart -->
+              <div class="mt-4 pt-3 border-t border-slate-100">
+                <div class="text-xs font-semibold text-slate-700 mb-2">Komposisi Stok Arsip</div>
+                <div class="h-40 relative flex justify-center">
+                  <canvas id="komposisiStokChart"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Box Rencana Pemusnahan Arsip -->
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
+                <div class="flex items-center gap-2">
+                  <i class="fa-solid fa-trash-can text-red-500"></i>
+                  <h3 class="text-sm font-bold text-slate-800">Rencana Pemusnahan</h3>
+                </div>
+                <span class="text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-mono">Tahun 2026</span>
+              </div>
+
+              <div class="flex items-center justify-between bg-slate-50 p-3 rounded-lg border border-slate-200/80 mb-3">
+                <div>
+                  <span class="text-[11px] text-slate-500 block">Bulan Rencana Aktif</span>
+                  <select id="selectBulanMusnahQuick" onchange="updateQuickMusnah()"
+                    class="text-xs font-bold text-slate-800 bg-transparent focus:outline-none">
+                    <option value="Oktober">Oktober 2026</option>
+                    <option value="November">November 2026</option>
+                    <option value="Desember">Desember 2026</option>
+                  </select>
+                </div>
+                <button onclick="switchTab('musnah')"
+                  class="px-2.5 py-1 bg-teal-600 hover:bg-teal-700 text-white rounded text-xs font-medium transition shadow-sm">
+                  Lihat Detail
+                </button>
+              </div>
+
+              <div class="mb-3">
+                <div class="text-xs text-slate-500">Jumlah Arsip yang Akan Dimusnahkan</div>
+                <div class="text-2xl font-extrabold text-red-600 mt-0.5" id="quickMusnahVolume">2.350 <span
+                    class="text-xs font-normal text-slate-500">Box/Folder</span></div>
+              </div>
+
+              <!-- Rincian Berdasarkan Jenis -->
+              <div class="space-y-1.5 text-xs text-slate-600 border-t border-slate-100 pt-3">
+                <div class="flex justify-between items-center">
+                  <span>Arsip Dinamis</span>
+                  <strong class="text-slate-800">1.200</strong>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span>Arsip Kepegawaian</span>
+                  <strong class="text-slate-800">850</strong>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span>Arsip Lainnya</span>
+                  <strong class="text-slate-800">300</strong>
+                </div>
+              </div>
+
+              <!-- Status Pemusnahan YTD Donut Mini -->
+              <div class="mt-4 pt-3 border-t border-slate-100">
+                <div class="text-xs font-semibold text-slate-700 mb-1">Status Pemusnahan Arsip (YTD)</div>
+                <div class="h-36 relative flex justify-center">
+                  <canvas id="statusMusnahChart"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Banner Slogan PUPR -->
+            <div
+              class="bg-gradient-to-r from-blue-700 to-indigo-800 rounded-xl p-4 text-white shadow-sm flex items-center gap-3">
+              <i class="fa-solid fa-award text-yellow-400 text-3xl"></i>
+              <div>
+                <h4 class="text-xs font-bold text-yellow-300 uppercase tracking-wide">Motto Kearsipan PU</h4>
+                <p class="text-xs font-medium text-blue-100 italic">"Arsip Tertata, Informasi Terjaga, Kinerja
+                  Meningkat"</p>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- ROW 3: REALISASI PEMUSNAHAN PER BULAN (BAR CHART) -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <div class="flex justify-between items-center mb-3">
+            <div>
+              <h3 class="text-sm font-bold text-slate-800">Realisasi Pemusnahan Arsip per Bulan</h3>
+              <p class="text-xs text-slate-500">Perbandingan target rencana vs realisasi volume pemusnahan tahun 2026
+              </p>
+            </div>
+            <div class="flex items-center gap-3 text-xs">
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-blue-600 rounded-sm inline-block"></span>
+                Realisasi</span>
+              <span class="flex items-center gap-1.5"><span class="w-3 h-1 bg-amber-500 inline-block"></span> Target
+                Rencana</span>
+            </div>
+          </div>
+          <div class="h-56 relative">
+            <canvas id="realisasiMusnahBarChart"></canvas>
+          </div>
+        </div>
+
+        <!-- ROW 4: ALUR KERJA SISTEM (SEPERTI GAMBAR 1 & 4) -->
+        <div class="bg-slate-900 rounded-xl p-5 text-white border border-slate-800 shadow-md">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></span>
+              <h3 class="text-sm font-bold text-white uppercase tracking-wider">Alur Kerja Sistem Logger Studio &
+                Kearsipan</h3>
+            </div>
+            <span class="text-xs text-yellow-400 font-mono">Satu Data - Satu Sistem</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+            <!-- Langkah 1 -->
+            <div class="bg-slate-800/80 p-3.5 rounded-lg border border-slate-700/80 flex flex-col justify-between">
+              <div>
+                <div
+                  class="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs mb-2">
+                  1</div>
+                <h4 class="text-xs font-bold text-blue-300">Akses Dashboard</h4>
+                <p class="text-[11px] text-slate-400 mt-1">Petugas gedung arsip masuk sistem memakai otorisasi
+                  masing-masing gedung.</p>
+              </div>
+              <span class="mt-3 text-[10px] text-slate-500 font-mono">Otentikasi Gedung</span>
+            </div>
+
+            <!-- Langkah 2 -->
+            <div class="bg-slate-800/80 p-3.5 rounded-lg border border-slate-700/80 flex flex-col justify-between">
+              <div>
+                <div
+                  class="w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs mb-2">
+                  2</div>
+                <h4 class="text-xs font-bold text-emerald-300">Input / Update Data</h4>
+                <p class="text-[11px] text-slate-400 mt-1">Mengisi capaian KPI, stok arsip, dan rencana musnah berkala.
+                </p>
+              </div>
+              <span class="mt-3 text-[10px] text-emerald-400 font-mono"><i
+                  class="fa-solid fa-file-excel mr-1"></i>Google Sheets DB</span>
+            </div>
+
+            <!-- Langkah 3 -->
+            <div class="bg-slate-800/80 p-3.5 rounded-lg border border-slate-700/80 flex flex-col justify-between">
+              <div>
+                <div
+                  class="w-7 h-7 rounded-full bg-amber-600 text-white flex items-center justify-center font-bold text-xs mb-2">
+                  3</div>
+                <h4 class="text-xs font-bold text-amber-300">Otomatis Terintegrasi</h4>
+                <p class="text-[11px] text-slate-400 mt-1">Data sheet sinkron langsung secara real-time ke bentuk grafik
+                  & infografis.</p>
+              </div>
+              <span class="mt-3 text-[10px] text-amber-400 font-mono">Real-time Sync</span>
+            </div>
+
+            <!-- Langkah 4 -->
+            <div class="bg-slate-800/80 p-3.5 rounded-lg border border-slate-700/80 flex flex-col justify-between">
+              <div>
+                <div
+                  class="w-7 h-7 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold text-xs mb-2">
+                  4</div>
+                <h4 class="text-xs font-bold text-purple-300">Monitoring & Analisis</h4>
+                <p class="text-[11px] text-slate-400 mt-1">Pimpinan & koordinator memantau capaian KPI dan keterlambatan
+                  data.</p>
+              </div>
+              <span class="mt-3 text-[10px] text-purple-400 font-mono">Looker Studio / Web</span>
+            </div>
+
+            <!-- Langkah 5 -->
+            <div class="bg-slate-800/80 p-3.5 rounded-lg border border-slate-700/80 flex flex-col justify-between">
+              <div>
+                <div
+                  class="w-7 h-7 rounded-full bg-cyan-600 text-white flex items-center justify-center font-bold text-xs mb-2">
+                  5</div>
+                <h4 class="text-xs font-bold text-cyan-300">Laporan & Evaluasi</h4>
+                <p class="text-[11px] text-slate-400 mt-1">Unduh laporan resmi format PDF atau Excel untuk pimpinan dan
+                  tindak lanjut.</p>
+              </div>
+              <span class="mt-3 text-[10px] text-cyan-400 font-mono">Export PDF / Excel</span>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ================= TAB 2: KPI KEARSIPAN (10 INDIKATOR LENGKAP) ================= -->
+      <section id="tab-kpi" class="tab-content hidden space-y-6">
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <div
+            class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 pb-4 border-b border-slate-200">
+            <div>
+              <h3 class="text-base font-bold text-slate-800">10 Indikator Utama KPI Kearsipan</h3>
+              <p class="text-xs text-slate-500">Berdasarkan Keputusan Standar Mutu Pengelolaan Arsip BBWS Cimanuk
+                Cisanggarung</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="exportKPIToCSV()"
+                class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-medium flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-file-excel"></i> Ekspor CSV
+              </button>
+            </div>
+          </div>
+
+          <!-- Grid 10 Indikator KPI Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mt-4" id="kpi10CardsContainer">
+            <!-- Dynamically populated with 10 KPI targets from image 3 -->
+          </div>
+
+          <!-- Tabel Detail 10 KPI per Gedung -->
+          <div class="mt-6">
+            <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">Tabel Detail Capaian 10 Indikator
+              Per Gedung Arsip</h4>
+            <div class="overflow-x-auto rounded-lg border border-slate-200">
+              <table class="w-full text-xs text-left">
+                <thead class="bg-slate-50 text-slate-700 uppercase border-b border-slate-200 font-semibold">
+                  <tr>
+                    <th class="py-3 px-3">Indikator Kearsipan</th>
+                    <th class="py-3 px-3 text-center">Standar Target</th>
+                    <th class="py-3 px-3 text-center">Pusat</th>
+                    <th class="py-3 px-3 text-center">Barat</th>
+                    <th class="py-3 px-3 text-center">Timur</th>
+                    <th class="py-3 px-3 text-center">Selatan</th>
+                    <th class="py-3 px-3 text-center">Utara</th>
+                    <th class="py-3 px-3 text-center">Rata-rata</th>
+                    <th class="py-3 px-3 text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100" id="tableDetail10KPI">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 3: STOK PENGELOLAAN ARSIP ================= -->
+      <section id="tab-stok" class="tab-content hidden space-y-6">
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+          <div
+            class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 pb-3 border-b border-slate-200">
+            <div>
+              <h3 class="text-base font-bold text-slate-800">Data Stok Pengelolaan Arsip di Seluruh Gedung</h3>
+              <p class="text-xs text-slate-500">Pencatatan arsip aktif, inaktif, vital, kondisi penyimpanan dan lokasi
+                rak/ruang</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="openModalTambahStok()"
+                class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-plus"></i> Tambah Data Stok
+              </button>
+            </div>
+          </div>
+
+          <!-- Ringkasan Filter & Statistik Stok -->
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+            <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <span class="text-[11px] text-blue-700 font-medium block">Total Stok Terdata</span>
+              <span class="text-xl font-bold text-blue-900" id="stokTabTotal">12.450 Box</span>
+            </div>
+            <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
+              <span class="text-[11px] text-emerald-700 font-medium block">Kondisi Baik</span>
+              <span class="text-xl font-bold text-emerald-900">11.890 Box (95.5%)</span>
+            </div>
+            <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+              <span class="text-[11px] text-amber-700 font-medium block">Kondisi Butuh Perawatan</span>
+              <span class="text-xl font-bold text-amber-900">560 Box (4.5%)</span>
+            </div>
+            <div class="p-3 bg-purple-50 border border-purple-200 rounded-lg">
+              <span class="text-[11px] text-purple-700 font-medium block">Kapasitas Rak Terpakai</span>
+              <span class="text-xl font-bold text-purple-900">78.2%</span>
+            </div>
+          </div>
+
+          <!-- Tabel Stok Arsip -->
+          <div class="overflow-x-auto rounded-lg border border-slate-200">
+            <table class="w-full text-xs text-left">
+              <thead class="bg-slate-50 text-slate-700 uppercase border-b border-slate-200 font-semibold">
+                <tr>
+                  <th class="py-2.5 px-3">Gedung Arsip</th>
+                  <th class="py-2.5 px-3">Bulan Update</th>
+                  <th class="py-2.5 px-3">Kategori Arsip</th>
+                  <th class="py-2.5 px-3 text-right">Jumlah</th>
+                  <th class="py-2.5 px-3">Satuan</th>
+                  <th class="py-2.5 px-3">Lokasi / Rak</th>
+                  <th class="py-2.5 px-3">Kondisi Fisik</th>
+                  <th class="py-2.5 px-3 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100" id="tableStokArsipBody">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 4: RENCANA PEMUSNAHAN ================= -->
+      <section id="tab-musnah" class="tab-content hidden space-y-6">
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+          <div
+            class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 pb-3 border-b border-slate-200">
+            <div>
+              <h3 class="text-base font-bold text-slate-800">Rencana & Realisasi Pemusnahan Arsip (Jan - Des 2026)</h3>
+              <p class="text-xs text-slate-500">Dasar hukum JRA/retensi, usul musnah, approval pimpinan, dan berita
+                acara pemusnahan</p>
+            </div>
+            <button onclick="openModalTambahMusnah()"
+              class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-medium flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-plus"></i> Tambah Usul Musnah
+            </button>
+          </div>
+
+          <!-- Tabel Rencana Musnah -->
+          <div class="overflow-x-auto rounded-lg border border-slate-200">
+            <table class="w-full text-xs text-left">
+              <thead class="bg-slate-50 text-slate-700 uppercase border-b border-slate-200 font-semibold">
+                <tr>
+                  <th class="py-2.5 px-3">Gedung Arsip</th>
+                  <th class="py-2.5 px-3">Jenis Arsip</th>
+                  <th class="py-2.5 px-3">Kurun Waktu</th>
+                  <th class="py-2.5 px-3">Dasar JRA / Retensi</th>
+                  <th class="py-2.5 px-3 text-right">Volume Target</th>
+                  <th class="py-2.5 px-3">Bulan Rencana</th>
+                  <th class="py-2.5 px-3 text-center">Status Proses</th>
+                  <th class="py-2.5 px-3 text-right">Realisasi</th>
+                  <th class="py-2.5 px-3 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100" id="tableRencanaMusnahBody">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 5: INPUT / UPDATE DATA (FORM PETUGAS) ================= -->
+      <section id="tab-input-data" class="tab-content hidden space-y-6">
+        <div class="max-w-4xl mx-auto bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+          <div class="flex items-center gap-3 pb-4 border-b border-slate-200 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl">
+              <i class="fa-solid fa-pen-nib"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-slate-800">Form Pengisian Data Kearsipan Bulanan</h3>
+              <p class="text-xs text-slate-500">Petugas gedung arsip wajib melengkapi data capaian dan bukti pendukung
+              </p>
+            </div>
+          </div>
+
+          <form id="formInputPetugas" onsubmit="handleFormInput(event)" class="space-y-6">
+
+            <!-- Metadata Gedung & Tanggal -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Gedung Arsip *</label>
+                <select id="inputGedungSelect" required
+                  class="w-full text-xs p-2 rounded border border-slate-300 bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                  <option value="Pusat">1. Gedung Arsip Pusat</option>
+                  <option value="Gedung 2">2. Gedung Arsip 2 (Barat)</option>
+                  <option value="Gedung 3">3. Gedung Arsip 3 (Timur)</option>
+                  <option value="Gedung 4">4. Gedung Arsip 4 (Selatan)</option>
+                  <option value="Gedung 5">5. Gedung Arsip 5 (Utara)</option>
+                  <option value="Gedung 6">6. Gedung Arsip 6 (Cirebon)</option>
+                  <option value="Gedung 7">7. Gedung Arsip 7 (Indramayu)</option>
+                  <option value="Gedung 8">8. Gedung Arsip 8 (Kuningan)</option>
+                  <option value="Gedung 9">9. Gedung Arsip 9 (Majalengka)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Bulan & Tahun Pembaruan *</label>
+                <input type="month" id="inputBulanTahun" value="2026-11" required
+                  class="w-full text-xs p-2 rounded border border-slate-300 bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Petugas Penginput *</label>
+                <input type="text" id="inputNamaPetugas" placeholder="Nama Petugas Arsip" value="Ahmad Subagyo" required
+                  class="w-full text-xs p-2 rounded border border-slate-300 bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              </div>
+            </div>
+
+            <!-- Input Capaian KPI Utama -->
+            <div>
+              <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider mb-3">1. Capaian KPI Kearsipan Bulan
+                Ini</h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="p-3 bg-white border border-slate-200 rounded-lg space-y-2">
+                  <label class="block text-xs font-medium text-slate-700">1. Pengelolaan Arsip Aktif (%) [Target:
+                    &ge;95%]</label>
+                  <input type="number" id="inputKpiAktif" min="0" max="100" value="95" required
+                    class="w-full text-xs p-2 rounded border border-slate-300">
+                </div>
+                <div class="p-3 bg-white border border-slate-200 rounded-lg space-y-2">
+                  <label class="block text-xs font-medium text-slate-700">2. Pengelolaan Arsip Inaktif (%) [Target:
+                    &ge;95%]</label>
+                  <input type="number" id="inputKpiInaktif" min="0" max="100" value="94" required
+                    class="w-full text-xs p-2 rounded border border-slate-300">
+                </div>
+                <div class="p-3 bg-white border border-slate-200 rounded-lg space-y-2">
+                  <label class="block text-xs font-medium text-slate-700">3. Layanan Peminjaman Arsip (%) [Target:
+                    &ge;95%]</label>
+                  <input type="number" id="inputKpiPinjam" min="0" max="100" value="98" required
+                    class="w-full text-xs p-2 rounded border border-slate-300">
+                </div>
+                <div class="p-3 bg-white border border-slate-200 rounded-lg space-y-2">
+                  <label class="block text-xs font-medium text-slate-700">4. Pengembalian Arsip (%) [Target:
+                    &ge;98%]</label>
+                  <input type="number" id="inputKpiKembali" min="0" max="100" value="98" required
+                    class="w-full text-xs p-2 rounded border border-slate-300">
+                </div>
+                <div class="p-3 bg-white border border-slate-200 rounded-lg space-y-2">
+                  <label class="block text-xs font-medium text-slate-700">5. Pemindahan Arsip (%) [Target:
+                    &ge;95%]</label>
+                  <input type="number" id="inputKpiPindah" min="0" max="100" value="96" required
+                    class="w-full text-xs p-2 rounded border border-slate-300">
+                </div>
+                <div class="p-3 bg-white border border-slate-200 rounded-lg space-y-2">
+                  <label class="block text-xs font-medium text-slate-700">6. Pemberkasan Arsip (%) [Target:
+                    &ge;95%]</label>
+                  <input type="number" id="inputKpiBerkas" min="0" max="100" value="95" required
+                    class="w-full text-xs p-2 rounded border border-slate-300">
+                </div>
+                <div class="p-3 bg-white border border-slate-200 rounded-lg space-y-2">
+                  <label class="block text-xs font-medium text-slate-700">7. Usul Serah & Usul Musnah (%) [Target:
+                    100%]</label>
+                  <input type="number" id="inputKpiUsulMusnah" min="0" max="100" value="100" required
+                    class="w-full text-xs p-2 rounded border border-slate-300">
+                </div>
+                <div class="p-3 bg-white border border-slate-200 rounded-lg space-y-2">
+                  <label class="block text-xs font-medium text-slate-700">8. Pemeliharaan Arsip (%) [Target:
+                    &ge;95%]</label>
+                  <input type="number" id="inputKpiPelihara" min="0" max="100" value="96" required
+                    class="w-full text-xs p-2 rounded border border-slate-300">
+                </div>
+              </div>
+            </div>
+
+            <!-- Bukti Pendukung / Tautan Google Drive -->
+            <div class="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+              <label class="block text-xs font-semibold text-slate-700">Tautan / Link Bukti Pendukung (Google Drive /
+                Berita Acara) *</label>
+              <input type="url" id="inputLinkBukti" placeholder="https://drive.google.com/drive/folders/..."
+                value="https://drive.google.com/drive/folders/arsip-bbws-cc-2026" required
+                class="w-full text-xs p-2.5 rounded border border-slate-300 bg-white">
+              <p class="text-[11px] text-slate-500">Tautan ini diperiksa oleh Admin Kearsipan saat tahap Validasi &
+                Monitoring.</p>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex justify-end gap-3 pt-3">
+              <button type="reset"
+                class="px-4 py-2 border border-slate-300 text-slate-600 rounded-lg text-xs font-medium hover:bg-slate-100 transition">
+                Reset Form
+              </button>
+              <button type="submit"
+                class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold flex items-center gap-2 transition shadow">
+                <i class="fa-solid fa-floppy-disk"></i> Simpan ke Database Pusat
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </section>
+
+      <!-- ================= TAB 6: LAPORAN & TINDAK LANJUT ================= -->
+      <section id="tab-laporan" class="tab-content hidden space-y-6">
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+          <div
+            class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 pb-3 border-b border-slate-200">
+            <div>
+              <h3 class="text-base font-bold text-slate-800">Laporan Eksekutif & Lembar Evaluasi Pimpinan</h3>
+              <p class="text-xs text-slate-500">Daftar gedung tepat waktu vs terlambat memperbarui data kearsipan</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="window.print()"
+                class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-medium flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-print"></i> Cetak / Simpan PDF
+              </button>
+              <button onclick="exportFullReportExcel()"
+                class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-medium flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-file-excel"></i> Unduh Format Excel
+              </button>
+            </div>
+          </div>
+
+          <!-- Status Kepatuhan Gedung -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
+              <div class="text-xs font-semibold text-emerald-800">Gedung Sudah Update (Bulan Ini)</div>
+              <div class="text-2xl font-bold text-emerald-900 mt-1">4 dari 5 Gedung</div>
+              <div class="text-[11px] text-emerald-700 mt-1">80% Kepatuhan pelaporan tepat waktu</div>
+            </div>
+            <div class="p-4 bg-rose-50 border border-rose-200 rounded-xl">
+              <div class="text-xs font-semibold text-rose-800">Gedung Belum / Terlambat Update</div>
+              <div class="text-2xl font-bold text-rose-900 mt-1">1 Gedung (Gedung Selatan)</div>
+              <div class="text-[11px] text-rose-700 mt-1">Perlu pengingat tindak lanjut</div>
+            </div>
+            <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+              <div class="text-xs font-semibold text-blue-800">Status Validasi Dokumen Pendukung</div>
+              <div class="text-2xl font-bold text-blue-900 mt-1">100% Terverifikasi</div>
+              <div class="text-[11px] text-blue-700 mt-1">Seluruh berkas bukti link Google Drive valid</div>
+            </div>
+          </div>
+
+          <!-- Lembar Evaluasi -->
+          <div class="p-5 border border-slate-200 rounded-xl bg-slate-50/50 space-y-3">
+            <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Catatan Evaluasi Pimpinan &
+              Rekomendasi Kerja</h4>
+            <div class="space-y-2 text-xs text-slate-700">
+              <div class="p-3 bg-white rounded border border-slate-200 flex items-start gap-2.5">
+                <i class="fa-solid fa-circle-check text-emerald-600 mt-0.5"></i>
+                <div>
+                  <strong class="text-slate-800">Capaian Layanan Peminjaman:</strong> Melampaui target standar nasional
+                  kearsipan (rata-rata 96% vs target &ge;95%). Pertahankan SOP pengembalian maksimal 3 hari kerja.
+                </div>
+              </div>
+              <div class="p-3 bg-white rounded border border-slate-200 flex items-start gap-2.5">
+                <i class="fa-solid fa-circle-exclamation text-amber-500 mt-0.5"></i>
+                <div>
+                  <strong class="text-slate-800">Percepatan Pemusnahan Arsip Retensi:</strong> Volume 2.350 box pada
+                  bulan Oktober telah siap berita acara. Dimohon panitia pemusnahan segera menjadwalkan saksi hukum dan
+                  inspektorat.
+                </div>
+              </div>
+              <div class="p-3 bg-white rounded border border-slate-200 flex items-start gap-2.5">
+                <i class="fa-solid fa-clock-rotate-left text-blue-600 mt-0.5"></i>
+                <div>
+                  <strong class="text-slate-800">Pengingat Gedung Arsip Selatan:</strong> Petugas gedung arsip selatan
+                  dihimbau menyelesaikan input realisasi fisik sebelum tanggal 20 setiap bulan.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 7: DATABASE PUSAT (GOOGLE SHEETS SIMULATION) ================= -->
+      <section id="tab-database" class="tab-content hidden space-y-6">
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+          <div
+            class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 pb-3 border-b border-slate-200">
+            <div>
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-file-excel text-emerald-600 text-lg"></i>
+                <h3 class="text-base font-bold text-slate-800">Struktur Database Pusat (Google Sheets Hub)</h3>
+              </div>
+              <p class="text-xs text-slate-500">Representasi 5 tabel utama Google Sheets sesuai desain format database
+              </p>
+            </div>
+            <!-- Sub Tab Tabs Database -->
+            <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-lg text-xs" id="dbTabButtons">
+              <button onclick="switchDbTable('MASTER_GEDUNG')"
+                class="db-tab-btn px-2.5 py-1 rounded font-medium bg-white text-slate-800 shadow-sm"
+                id="btn-db-MASTER_GEDUNG">MASTER_GEDUNG</button>
+              <button onclick="switchDbTable('MASTER_KPI')"
+                class="db-tab-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:text-slate-900"
+                id="btn-db-MASTER_KPI">MASTER_KPI</button>
+              <button onclick="switchDbTable('INPUT_KPI')"
+                class="db-tab-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:text-slate-900"
+                id="btn-db-INPUT_KPI">INPUT_KPI</button>
+              <button onclick="switchDbTable('STOK_ARSIP')"
+                class="db-tab-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:text-slate-900"
+                id="btn-db-STOK_ARSIP">STOK_ARSIP</button>
+              <button onclick="switchDbTable('RENCANA_MUSNAH')"
+                class="db-tab-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:text-slate-900"
+                id="btn-db-RENCANA_MUSNAH">RENCANA_MUSNAH</button>
+            </div>
+          </div>
+
+          <!-- Dynamic DB View -->
+          <div class="overflow-x-auto rounded-lg border border-slate-200 max-h-96">
+            <table class="w-full text-xs text-left" id="tableDatabaseView">
+              <!-- Rendered by JS -->
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 8: SDM & KONVERSI TARGET BERJENJANG ================= -->
+      <section id="tab-sdm-target" class="tab-content hidden space-y-6">
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-5">
+          <div
+            class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 pb-3 border-b border-slate-200">
+            <div>
+              <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-users-gear text-indigo-600"></i> Penentuan SDM Gedung & Konversi Target Kerja
+                Berjenjang
+              </h3>
+              <p class="text-xs text-slate-500">Alur: Target per Unit/Orang &rarr; Dikonversi per Gedung Arsip &rarr;
+                Agregasi Pusat (10 Indikator)</p>
+            </div>
+            <span
+              class="text-xs px-2.5 py-1 bg-indigo-50 text-indigo-700 font-semibold rounded-lg border border-indigo-200">
+              Total: <span id="sdmTotalGedungCount">5</span> Gedung | <span id="sdmTotalOrangCount">18</span> SDM
+              Arsiparis
+            </span>
+          </div>
+
+          <!-- Ringkasan SDM & Jumlah Gedung -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <div class="p-3.5 bg-indigo-50 border border-indigo-200 rounded-xl">
+              <span class="text-[11px] text-indigo-700 font-medium block">Jumlah Gedung Arsip</span>
+              <span class="text-2xl font-extrabold text-indigo-900" id="cardJumlahGedung">5 Gedung</span>
+            </div>
+            <div class="p-3.5 bg-blue-50 border border-blue-200 rounded-xl">
+              <span class="text-[11px] text-blue-700 font-medium block">Total SDM Arsiparis</span>
+              <span class="text-2xl font-extrabold text-blue-900" id="cardTotalSDM">18 Orang</span>
+            </div>
+            <div class="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl">
+              <span class="text-[11px] text-emerald-700 font-medium block">Target / Orang (Rata-rata)</span>
+              <span class="text-2xl font-extrabold text-emerald-900" id="cardTargetPerOrang">20 Box/Bln</span>
+            </div>
+            <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-xl">
+              <span class="text-[11px] text-amber-700 font-medium block">Target Pusat (10 Indikator)</span>
+              <span class="text-2xl font-extrabold text-amber-900" id="cardTargetPusatTotal">360 Box/Bln</span>
+            </div>
+          </div>
+
+          <!-- Tabel Penentuan SDM per Gedung & Konversi Target -->
+          <div class="overflow-x-auto rounded-lg border border-slate-200">
+            <table class="w-full text-xs text-left">
+              <thead class="bg-slate-50 text-slate-700 uppercase border-b border-slate-200 font-semibold">
+                <tr>
+                  <th class="py-2.5 px-3">Kode & Gedung Arsip</th>
+                  <th class="py-2.5 px-3">Wilayah</th>
+                  <th class="py-2.5 px-3 text-center">Jumlah SDM (Orang)</th>
+                  <th class="py-2.5 px-3 text-center">Target / Orang (Box/Bln)</th>
+                  <th class="py-2.5 px-3 text-right">Target Gedung (SDM &times; Target)</th>
+                  <th class="py-2.5 px-3 text-right">Konversi Pusat (10 Indikator)</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100" id="tableSDMTargetBody">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+          <p class="text-[11px] text-slate-500"><i class="fa-solid fa-circle-info text-indigo-500 mr-1"></i> Ubah angka
+            <strong>Jumlah SDM</strong> atau <strong>Target/Orang</strong> langsung pada tabel untuk melihat konversi
+            otomatis ke tingkat Gedung dan Pusat.</p>
+        </div>
+      </section>
+
+      <!-- ================= TAB 9: REKAP SEMESTER (6 BULAN), ANRI & RENCANA 5 TAHUN ================= -->
+      <section id="tab-anri-rekap" class="tab-content hidden space-y-6">
+
+        <!-- Bagian 1: Rekap Penomoran 6 Bulan (2x Setahun) & Laporan Tahunan ke ANRI -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+          <div
+            class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 pb-3 border-b border-slate-200">
+            <div>
+              <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-building-columns text-rose-600"></i> Rekap Semesteran (6 Bulan / 2x Setahun) &amp;
+                Laporan Tahunan ke ANRI
+              </h3>
+              <p class="text-xs text-slate-500">Konsolidasi penomoran arsip Wilayah A, B, C &rarr; Pusat (350) &rarr;
+                Laporan Tahunan ANRI (1 &ndash; 350)</p>
+            </div>
+            <span class="text-xs px-2.5 py-1 bg-rose-50 text-rose-700 font-bold rounded-lg border border-rose-200">UPB I
+              2026 + Masuk Bentuk</span>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <!-- Tabel Kiri: Per 6 Bulan (2x Setahun) -->
+            <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 space-y-3">
+              <div class="flex justify-between items-center">
+                <h4 class="text-xs font-bold text-slate-800 uppercase">1. Laporan Setiap 6 Bulan (2x Setahun)</h4>
+                <span class="text-[11px] font-mono bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-bold">Semester I
+                  &amp; II</span>
+              </div>
+              <table class="w-full text-xs text-left bg-white rounded-lg overflow-hidden border border-slate-200">
+                <thead class="bg-slate-100 text-slate-700 font-semibold">
+                  <tr>
+                    <th class="py-2 px-3">No</th>
+                    <th class="py-2 px-3">Wilayah</th>
+                    <th class="py-2 px-3">Rentang Nomor</th>
+                    <th class="py-2 px-3 text-right">Jumlah</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100" id="tableSemesterBody">
+                  <tr>
+                    <td class="py-2 px-3">1</td>
+                    <td class="py-2 px-3 font-semibold">Wilayah A</td>
+                    <td class="py-2 px-3 font-mono">1 &ndash; 100</td>
+                    <td class="py-2 px-3 text-right font-bold">100</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2 px-3">2</td>
+                    <td class="py-2 px-3 font-semibold">Wilayah B</td>
+                    <td class="py-2 px-3 font-mono">1 &ndash; 50</td>
+                    <td class="py-2 px-3 text-right font-bold">50</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2 px-3">3</td>
+                    <td class="py-2 px-3 font-semibold">Wilayah C</td>
+                    <td class="py-2 px-3 font-mono">1 &ndash; 200</td>
+                    <td class="py-2 px-3 text-right font-bold">200</td>
+                  </tr>
+                  <tr class="bg-blue-50 font-bold text-blue-900">
+                    <td class="py-2 px-3" colspan="2">Total Konsolidasi Pusat</td>
+                    <td class="py-2 px-3 font-mono">Setiap 6 Bulan (2x)</td>
+                    <td class="py-2 px-3 text-right">350</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Tabel Kanan: Laporan Tahunan ke ANRI -->
+            <div class="border border-rose-200 rounded-xl p-4 bg-rose-50/30 space-y-3">
+              <div class="flex justify-between items-center">
+                <h4 class="text-xs font-bold text-rose-900 uppercase">2. Laporan Tahunan &rarr; ANRI (Pusat)</h4>
+                <span class="text-[11px] font-mono bg-rose-100 text-rose-800 px-2 py-0.5 rounded font-bold">1 Tahun (1
+                  &ndash; 350)</span>
+              </div>
+              <table class="w-full text-xs text-left bg-white rounded-lg overflow-hidden border border-rose-200">
+                <thead class="bg-rose-50 text-rose-900 font-semibold">
+                  <tr>
+                    <th class="py-2 px-3">No</th>
+                    <th class="py-2 px-3">Wilayah</th>
+                    <th class="py-2 px-3">Penomoran Terkonsolidasi</th>
+                    <th class="py-2 px-3 text-right">Volume</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  <tr>
+                    <td class="py-2 px-3">1</td>
+                    <td class="py-2 px-3 font-semibold">Wilayah A</td>
+                    <td class="py-2 px-3 font-mono text-rose-700 font-bold">1 &ndash; 100</td>
+                    <td class="py-2 px-3 text-right font-bold">100</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2 px-3">2</td>
+                    <td class="py-2 px-3 font-semibold">Wilayah B</td>
+                    <td class="py-2 px-3 font-mono text-rose-700 font-bold">101 &ndash; 150</td>
+                    <td class="py-2 px-3 text-right font-bold">50</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2 px-3">3</td>
+                    <td class="py-2 px-3 font-semibold">Wilayah C</td>
+                    <td class="py-2 px-3 font-mono text-rose-700 font-bold">151 &ndash; 350</td>
+                    <td class="py-2 px-3 text-right font-bold">200</td>
+                  </tr>
+                  <tr class="bg-rose-100/80 font-bold text-rose-950">
+                    <td class="py-2 px-3" colspan="2">Total Dikirim Pusat &rarr; ANRI</td>
+                    <td class="py-2 px-3 font-mono">1 &ndash; 350 (1 Tahun)</td>
+                    <td class="py-2 px-3 text-right">350</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bagian 2: Rencana Penyusutan / Pemusnahan 5 Tahun (2026 - 2030) -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+          <div
+            class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 pb-3 border-b border-slate-200">
+            <div>
+              <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-calendar-range text-purple-600"></i> Rencana Penyusutan / Pemusnahan Jangka 5
+                Tahun (2026 &ndash; 2030)
+              </h3>
+              <p class="text-xs text-slate-500">Proyeksi penyusutan, pemindahan inaktif, dan pemusnahan arsip jangka
+                menengah 5 tahunan</p>
+            </div>
+          </div>
+          <div class="overflow-x-auto rounded-lg border border-slate-200">
+            <table class="w-full text-xs text-left">
+              <thead class="bg-slate-50 text-slate-700 uppercase border-b border-slate-200 font-semibold">
+                <tr>
+                  <th class="py-2.5 px-3">Tahun</th>
+                  <th class="py-2.5 px-3">Program Penyusutan / Pemusnahan</th>
+                  <th class="py-2.5 px-3">Cakupan Wilayah / Gedung</th>
+                  <th class="py-2.5 px-3 text-right">Target Volume (Box)</th>
+                  <th class="py-2.5 px-3 text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100" id="tableRencana5TahunBody">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODAL PENGATURAN -->
+  <div id="modalSettings"
+    class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-5 space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+        <h4 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+          <i class="fa-solid fa-sliders text-blue-600"></i> Pengaturan Konektor & Sinkronisasi
+        </h4>
+        <button onclick="closeModal('modalSettings')" class="text-slate-400 hover:text-slate-600">&times;</button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">URL Google Sheets Spreadsheet</label>
+          <input type="text" value="https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdB.../edit"
+            class="w-full p-2 border border-slate-300 rounded bg-slate-50 text-slate-600" readonly>
+          <p class="text-[10px] text-slate-400 mt-1">Tersambung via Webhook & Looker Studio API</p>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Frekuensi Auto-Refresh Dashboard</label>
+          <select class="w-full p-2 border border-slate-300 rounded">
+            <option>Realtime (Saat ada pembaruan sheet)</option>
+            <option>Setiap 15 Menit</option>
+            <option>Setiap Hari</option>
+          </select>
+        </div>
+        <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-800 text-[11px]">
+          <strong>Info:</strong> Seluruh data di aplikasi ini tersimpan di memori browser (LocalStorage) dan siap
+          dihubungkan langsung ke Google Apps Script / Sheet ID Anda.
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2 border-t border-slate-200">
+        <button onclick="closeModal('modalSettings')"
+          class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded text-xs">Tutup</button>
+        <button onclick="resetDataDefault()"
+          class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded text-xs">Reset ke Data Awal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT UTAMA -->
+  <script src="app.js"></script>
+</body>
+
+</html>
